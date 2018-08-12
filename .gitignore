@@ -1,0 +1,6 @@
+__pycache__/
+.idea/*
+submissions
+data
+logs
+models
