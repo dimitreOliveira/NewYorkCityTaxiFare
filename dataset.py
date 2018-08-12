@@ -32,9 +32,31 @@ def pandas_train_input_fn(df, label):
     )
 
 
+def numpy_train_input_fn(df, features, label):
+    return tf.estimator.inputs.numpy_input_fn(
+        x={features[i]: df[:, i] for i in range(len(features))},
+        y=label,
+        batch_size=128,
+        num_epochs=100,
+        shuffle=True,
+        queue_capacity=1000
+    )
+
+
 def pandas_test_input_fn(df):
     return tf.estimator.inputs.pandas_input_fn(
         x=df,
+        y=None,
+        batch_size=128,
+        num_epochs=1,
+        shuffle=True,
+        queue_capacity=1000
+    )
+
+
+def numpy_test_input_fn(df, features):
+    return tf.estimator.inputs.numpy_input_fn(
+        x={features[i]: df[:, i] for i in range(len(features))},
         y=None,
         batch_size=128,
         num_epochs=1,
