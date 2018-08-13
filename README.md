@@ -1,4 +1,4 @@
-![](https://i.imgur.com/SESNTXJ.jpg)
+![](https://cdn.static-economist.com/sites/default/files/images/2015/08/blogs/graphic-detail/20150815_blp501.jpg)
 
 # Deep Learning regression with Tensorflow
 

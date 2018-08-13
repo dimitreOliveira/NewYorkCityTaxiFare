@@ -1,5 +1,3 @@
-from sklearn.model_selection import train_test_split
-from sklearn import preprocessing
 import pandas as pd
 from dataset import *
 
@@ -16,7 +14,6 @@ CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pic
 LABEL_COLUMN = 'fare_amount'
 DEFAULTS = [['nokey'], [1.0], ['date'], [-74.0], [40.0], [-74.0], [40.7], [1.0]]
 
-
 INPUT_COLUMNS = [
     tf.feature_column.numeric_column('pickup_longitude'),
     tf.feature_column.numeric_column('pickup_latitude'),
@@ -28,10 +25,11 @@ INPUT_COLUMNS = [
 feature_cols = add_more_features(INPUT_COLUMNS)
 
 run_config = tf.estimator.RunConfig(model_dir='models/', save_summary_steps=5000, save_checkpoints_steps=5000)
-train_spec = tf.estimator.TrainSpec(input_fn=get_train(TRAIN_PATH, CSV_COLUMNS, LABEL_COLUMN), max_steps=20000)
-eval_spec = tf.estimator.EvalSpec(input_fn=get_valid(VALIDATION_PATH, CSV_COLUMNS, LABEL_COLUMN), steps=100, throttle_secs=300)
+train_spec = tf.estimator.TrainSpec(input_fn=get_train(TRAIN_PATH, CSV_COLUMNS, LABEL_COLUMN, default_value=DEFAULTS),
+                                    max_steps=20000)
+eval_spec = tf.estimator.EvalSpec(input_fn=get_valid(VALIDATION_PATH, CSV_COLUMNS, LABEL_COLUMN,
+                                                     default_value=DEFAULTS), steps=100, throttle_secs=300)
 
-# estimator = tf.estimator.LinearRegressor(feature_columns=feature_cols, config=run_config)
 estimator = tf.estimator.DNNRegressor(hidden_units=[128, 64, 32], feature_columns=feature_cols, config=run_config)
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 
@@ -44,9 +42,8 @@ prediction = estimator.predict(numpy_test_input_fn(test, ['pickup_longitude', 'p
 
 prediction_df = pd.DataFrame(prediction)
 
-output_submission(test_raw, prediction_df, 'key', 'fare_amount', 'submission6.csv')
+output_submission(test_raw, prediction_df, 'key', 'fare_amount', 'submission7.csv')
 
-# print('loading data')
 # train_raw, test_raw = load_data(TRAIN_PATH, TEST_PATH)
 #
 # # pre process
