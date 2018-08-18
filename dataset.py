@@ -34,23 +34,27 @@ def read_dataset(filename, mode, features_cols, label_col, default_value, batch_
 
 
 def get_train(data_path, features, label, default_value, batch_size=512):
-    return read_dataset(data_path, mode=tf.estimator.ModeKeys.TRAIN, features_cols=features, label_col=label,
+    return read_dataset(data_path, mode=tf.estimator.ModeKeys.TRAIN, features_cols=add_engineered(features), label_col=label,
                         default_value=default_value, batch_size=batch_size)
 
 
 def get_valid(data_path, features, label, default_value, batch_size=512):
-    return read_dataset(data_path, mode=tf.estimator.ModeKeys.EVAL, features_cols=features, label_col=label,
+    return read_dataset(data_path, mode=tf.estimator.ModeKeys.EVAL, features_cols=add_engineered(features), label_col=label,
                         default_value=default_value, batch_size=batch_size)
 
 
 def get_test(data_path, features, label, default_value, batch_size=512):
-    return read_dataset(data_path, mode=tf.estimator.ModeKeys.PREDICT, features_cols=features, label_col=label,
+    return read_dataset(data_path, mode=tf.estimator.ModeKeys.PREDICT, features_cols=add_engineered(features), label_col=label,
                         default_value=default_value, batch_size=batch_size)
 
 
-def add_more_features(feats):
+def add_more_features(features):
     # Nothing to add (yet!)
-    return feats
+    return features
+
+def add_engineered(features):
+    # Nothing to add (yet!)
+    return features
 
 
 def pandas_train_input_fn(df, label):

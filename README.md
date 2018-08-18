@@ -1,4 +1,4 @@
-![](https://cdn.static-economist.com/sites/default/files/images/2015/08/blogs/graphic-detail/20150815_blp501.jpg)
+![](https://www.fly.com/blog/wp-content/uploads/2017/12/2017-12-13_Fly_BlogPostFeaturedImage_DealOfTheDay.jpg)
 
 # Deep Learning regression with Tensorflow
 
