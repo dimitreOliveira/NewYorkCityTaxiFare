@@ -60,7 +60,7 @@ def add_engineered(features):
     lat1 = features['pickup_latitude']
     lat2 = features['dropoff_latitude']
     lon1 = features['pickup_longitude']
-    lon2 = features['dropoff_latitude']
+    lon2 = features['dropoff_longitude']
     latdiff = (lat1 - lat2)
     londiff = (lon1 - lon2)
     euclidean = (latdiff ** 2 + londiff ** 2) ** 0.5
@@ -75,7 +75,8 @@ def add_engineered(features):
 
 def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
     # Input columns
-    (latdiff, londiff, euclidean, plon, plat, dlon, dlat, pcount) = input_columns
+    # (latdiff, londiff, euclidean, plon, plat, dlon, dlat, pcount) = input_columns
+    (plon, plat, dlon, dlat, pcount, latdiff, londiff, euclidean) = input_columns
 
     # Bucketize the lats & lons
     latbuckets = np.linspace(38.0, 42.0, nbuckets).tolist()
@@ -179,7 +180,6 @@ def make_feature_cols(features):
 
 
 def output_submission(df, prediction_df, id_column, prediction_column, file_name):
-    print('Outputting submission...')
     df[prediction_column] = prediction_df['predictions'].apply(lambda x: x[0])
     df[[id_column, prediction_column]].to_csv(('submissions/%s' % file_name), index=False)
     print('Output complete')

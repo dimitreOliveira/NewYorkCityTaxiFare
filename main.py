@@ -6,10 +6,10 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 # Parameters
 TRAIN_PATH = 'data/tf_train.csv'
-VALIDATION_PATH = 'data/tf_validat1ion.csv'
+VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/tf_test.csv'
-MODEL_DIR = 'models/model4'
-SUBMISSION_NAME = 'submission4.csv'
+MODEL_DIR = 'models/model6'
+SUBMISSION_NAME = 'submission6.csv'
 
 
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
@@ -38,7 +38,7 @@ estimator = build_estimator(MODEL_DIR, 16, [64, 64, 64, 8], INPUT_COLUMNS)
 
 run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000, save_checkpoints_steps=5000)
 train_spec = tf.estimator.TrainSpec(input_fn=get_train(TRAIN_PATH, CSV_COLUMNS, LABEL_COLUMN, default_value=DEFAULTS),
-                                    max_steps=100000)
+                                    max_steps=200000)
 eval_spec = tf.estimator.EvalSpec(input_fn=get_valid(VALIDATION_PATH, CSV_COLUMNS, LABEL_COLUMN,
                                                      default_value=DEFAULTS), steps=100, throttle_secs=300)
 
@@ -49,8 +49,11 @@ tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval
 test_raw = pd.read_csv('data/test.csv')
 add_engineered(test_raw)
 test = test_raw.drop(['pickup_datetime', 'key'], axis=1).as_matrix()
-prediction = estimator.predict(numpy_test_input_fn(test, ['pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
-                                                          'dropoff_latitude', 'passenger_count', 'latdiff', 'londiff',
-                                                          'euclidean']))
+
+# prediction = estimator.predict(numpy_test_input_fn(test, ['pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
+#                                                           'dropoff_latitude', 'passenger_count', 'latdiff', 'londiff',
+#                                                           'euclidean']))
+prediction = estimator.predict(pandas_test_input_fn(test_raw))
+
 prediction_df = pd.DataFrame(prediction)
 output_submission(test_raw, prediction_df, 'key', 'fare_amount', SUBMISSION_NAME)
