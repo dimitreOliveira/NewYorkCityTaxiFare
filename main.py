@@ -8,8 +8,8 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/tf_test.csv'
-MODEL_DIR = 'models/model6'
-SUBMISSION_NAME = 'submission6.csv'
+MODEL_DIR = 'models/model7'
+SUBMISSION_NAME = 'submission7.csv'
 
 
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
@@ -38,7 +38,7 @@ estimator = build_estimator(MODEL_DIR, 16, [64, 64, 64, 8], INPUT_COLUMNS)
 
 run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000, save_checkpoints_steps=5000)
 train_spec = tf.estimator.TrainSpec(input_fn=get_train(TRAIN_PATH, CSV_COLUMNS, LABEL_COLUMN, default_value=DEFAULTS),
-                                    max_steps=200000)
+                                    max_steps=20000)
 eval_spec = tf.estimator.EvalSpec(input_fn=get_valid(VALIDATION_PATH, CSV_COLUMNS, LABEL_COLUMN,
                                                      default_value=DEFAULTS), steps=100, throttle_secs=300)
 
