@@ -2,13 +2,22 @@ import csv
 
 
 def clean_data(input_data_path='data/train.csv', output_data_path='data/train_cleaned.csv'):
+    """
+    Clean the data set, removing any row with missing values,
+    delimiter longitudes and latitudes to fit only NY city values,
+    only fare amount greater than 0,
+    and passenger count greater than 0 and lesser than 7,
+    i also removed the header as i'm using tensorflow to load data.
+    :param input_data_path: path containing the raw data set.
+    :param output_data_path: path to write the cleaned data.
+    """
     with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
         writer = csv.writer(out)
         count = 0
         for row in csv.reader(inp):
-            # remove header
+            # Remove header
             if count > 0:
-                # only rows with non-null values
+                # Only rows with non-null values
                 if len(row) == 8:
                     try:
                         fare_amount = float(row[1])
@@ -26,32 +35,69 @@ def clean_data(input_data_path='data/train.csv', output_data_path='data/train_cl
             count += 1
 
 
+def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data_path='data/train_processed.csv'):
+    """
+    Pre process the train data, deriving, year, month, day and hour for each row.
+    :param input_data_path: path containing the full data set.
+    :param output_data_path: path to write the pre processed set.
+    """
+    with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
+        writer = csv.writer(out)
+        for row in csv.reader(inp):
+            # Avoid any empty line
+            if len(row) > 0:
+                pickup_datetime = row[2]
+                year = float(pickup_datetime[:4])
+                month = float(pickup_datetime[5:7])
+                day = float(pickup_datetime[8:10])
+                hour = float(pickup_datetime[11:13])
+                row.append(year)
+                row.append(month)
+                row.append(day)
+                row.append(hour)
+                writer.writerow(row)
+
+
+def pre_process_test_data(input_data_path='data/train_cleaned.csv', output_data_path='data/train_processed.csv'):
+    """
+    Pre process the test data, deriving, year, month, day and hour for each row.
+    :param input_data_path: path containing the full data set.
+    :param output_data_path: path to write the pre processed set.
+    """
+    with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
+        writer = csv.writer(out)
+        for row in csv.reader(inp):
+            # Avoid any empty line
+            if len(row) > 0:
+                pickup_datetime = row[1]
+                year = float(pickup_datetime[:4])
+                month = float(pickup_datetime[5:7])
+                day = float(pickup_datetime[8:10])
+                hour = float(pickup_datetime[11:13])
+                row.append(year)
+                row.append(month)
+                row.append(day)
+                row.append(hour)
+                writer.writerow(row)
+
+
 def split_data(input_data_path, train_data_path, validation_data_path, ratio=30):
+    """
+    Splits the csv file (meant to generate train and validation sets).
+    :param input_data_path: path containing the full data set.
+    :param train_data_path: path to write the train set.
+    :param validation_data_path: path to write the validation set.
+    :param ratio: ration to split train and validation sets, (default: 1 of every 30 rows will be validation or 0,033%)
+    """
     with open(input_data_path, 'r') as inp, open(train_data_path, 'w') as out1, open(validation_data_path, 'w') as out2:
         writer1 = csv.writer(out1)
         writer2 = csv.writer(out2)
         count = 0
         for row in csv.reader(inp):
+            # Avoid any empty line
             if len(row) > 0:
                 if count % ratio == 0:
                     writer2.writerow(row)
                 else:
                     writer1.writerow(row)
                 count += 1
-
-
-def pre_process_data(input_data_path='data/train_cleaned.csv', output_data_path='data/train_processed.csv'):
-    with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
-        writer = csv.writer(out)
-        for row in csv.reader(inp):
-            if len(row) > 0:
-                pickup_datetime = row[2]
-                year = pickup_datetime[:4]
-                month = pickup_datetime[5:7]
-                day = pickup_datetime[8:10]
-                hour = pickup_datetime[11:13]
-                row.append(year)
-                row.append(month)
-                row.append(day)
-                row.append(hour)
-                writer.writerow(row)

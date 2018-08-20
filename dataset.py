@@ -50,11 +50,6 @@ def get_test(data_path, features, label, default_value, batch_size=512):
                         default_value=default_value, batch_size=batch_size)
 
 
-def add_more_features(features):
-    # Nothing to add (yet!)
-    return features
-
-
 def add_engineered(features):
     # Feature engineering as data is feed
     lat1 = features['pickup_latitude']
@@ -75,8 +70,8 @@ def add_engineered(features):
 
 def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
     # Input columns
-    # (latdiff, londiff, euclidean, plon, plat, dlon, dlat, pcount) = input_columns
-    (plon, plat, dlon, dlat, pcount, latdiff, londiff, euclidean) = input_columns
+    # (plon, plat, dlon, dlat, pcount, latdiff, londiff, euclidean) = input_columns
+    (plon, plat, dlon, dlat, pcount, year, month, day, hour, latdiff, londiff, euclidean) = input_columns
 
     # Bucketize the lats & lons
     latbuckets = np.linspace(38.0, 42.0, nbuckets).tolist()
@@ -97,9 +92,10 @@ def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
         dloc, ploc, pd_pair,
 
         # Sparse columns
+        month, day, hour,
 
-        # Anythin with a linear relationship
-        pcount
+        # Anything with a linear relationship
+        year, pcount
     ]
 
     deep_columns = [
@@ -126,7 +122,8 @@ def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
 def add_eval_metrics(labels, predictions):
     pred_values = predictions['predictions']
     return {
-        'rmse': tf.metrics.root_mean_squared_error(labels, pred_values)
+        'rmse': tf.metrics.root_mean_squared_error(labels, pred_values),
+        'mae': tf.metrics.mean_absolute_error(labels, pred_values)
     }
 
 
