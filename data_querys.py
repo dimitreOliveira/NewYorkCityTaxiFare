@@ -47,10 +47,10 @@ def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data
             # Avoid any empty line
             if len(row) > 0:
                 pickup_datetime = row[2]
-                year = float(pickup_datetime[:4])
-                month = float(pickup_datetime[5:7])
-                day = float(pickup_datetime[8:10])
-                hour = float(pickup_datetime[11:13])
+                year = int(pickup_datetime[:4])
+                month = int(pickup_datetime[5:7])
+                day = int(pickup_datetime[8:10])
+                hour = int(pickup_datetime[11:13])
                 row.append(year)
                 row.append(month)
                 row.append(day)
@@ -58,7 +58,7 @@ def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data
                 writer.writerow(row)
 
 
-def pre_process_test_data(input_data_path='data/train_cleaned.csv', output_data_path='data/train_processed.csv'):
+def pre_process_test_data(input_data_path='data/test.csv', output_data_path='data/test_processed.csv'):
     """
     Pre process the test data, deriving, year, month, day and hour for each row.
     :param input_data_path: path containing the full data set.
@@ -66,19 +66,21 @@ def pre_process_test_data(input_data_path='data/train_cleaned.csv', output_data_
     """
     with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
         writer = csv.writer(out)
+        count = 0
         for row in csv.reader(inp):
             # Avoid any empty line
             if len(row) > 0:
                 pickup_datetime = row[1]
-                year = float(pickup_datetime[:4])
-                month = float(pickup_datetime[5:7])
-                day = float(pickup_datetime[8:10])
-                hour = float(pickup_datetime[11:13])
+                year = int(pickup_datetime[:4])
+                month = int(pickup_datetime[5:7])
+                day = int(pickup_datetime[8:10])
+                hour = int(pickup_datetime[11:13])
                 row.append(year)
                 row.append(month)
                 row.append(day)
                 row.append(hour)
                 writer.writerow(row)
+            count += 1
 
 
 def split_data(input_data_path, train_data_path, validation_data_path, ratio=30):

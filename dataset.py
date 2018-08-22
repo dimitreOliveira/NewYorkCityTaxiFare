@@ -70,7 +70,6 @@ def add_engineered(features):
 
 def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
     # Input columns
-    # (plon, plat, dlon, dlat, pcount, latdiff, londiff, euclidean) = input_columns
     (plon, plat, dlon, dlat, pcount, year, month, day, hour, latdiff, londiff, euclidean) = input_columns
 
     # Bucketize the lats & lons
