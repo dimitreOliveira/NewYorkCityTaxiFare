@@ -8,14 +8,14 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model8'
-SUBMISSION_NAME = 'submission8.csv'
+MODEL_DIR = 'models/model9'
+SUBMISSION_NAME = 'submission9.csv'
 
 
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
-               'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour']
+               'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday']
 LABEL_COLUMN = 'fare_amount'
-DEFAULTS = [['nokey'], [1.0], ['2009-06-15 17:26:21 UTC'], [-74.0], [40.0], [-74.0], [40.7], [1.0], [2009], [6], [15], [17]]
+DEFAULTS = [['nokey'], [1.0], ['2009-06-15 17:26:21 UTC'], [-74.0], [40.0], [-74.0], [40.7], [1.0], [2009], [6], [15], [17], [1]]
 INPUT_COLUMNS = [
     # raw data columns
     tf.feature_column.numeric_column('pickup_longitude'),
@@ -24,11 +24,12 @@ INPUT_COLUMNS = [
     tf.feature_column.numeric_column('dropoff_latitude'),
     tf.feature_column.numeric_column('passenger_count'),
 
-    # engineered columns
+    # engineered columns'1
     tf.feature_column.numeric_column('year'),
     tf.feature_column.categorical_column_with_identity('month', num_buckets=13),
     tf.feature_column.categorical_column_with_identity('day', num_buckets=32),
     tf.feature_column.categorical_column_with_identity('hour', num_buckets=24),
+    tf.feature_column.categorical_column_with_identity('weekday', num_buckets=7),
 
     # tensorflow engineered columns
     tf.feature_column.numeric_column('latdiff'),
@@ -43,7 +44,7 @@ run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000
 train_spec = tf.estimator.TrainSpec(input_fn=get_train(TRAIN_PATH, CSV_COLUMNS, LABEL_COLUMN, default_value=DEFAULTS),
                                     max_steps=100000)
 eval_spec = tf.estimator.EvalSpec(input_fn=get_valid(VALIDATION_PATH, CSV_COLUMNS, LABEL_COLUMN,
-                                                     default_value=DEFAULTS), steps=100, throttle_secs=300)
+                                                     default_value=DEFAULTS), steps=1000, throttle_secs=300)
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 

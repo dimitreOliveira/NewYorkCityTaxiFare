@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 
 
 def clean_data(input_data_path='data/train.csv', output_data_path='data/train_cleaned.csv'):
@@ -46,15 +47,12 @@ def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data
         for row in csv.reader(inp):
             # Avoid any empty line
             if len(row) > 0:
-                pickup_datetime = row[2]
-                year = int(pickup_datetime[:4])
-                month = int(pickup_datetime[5:7])
-                day = int(pickup_datetime[8:10])
-                hour = int(pickup_datetime[11:13])
-                row.append(year)
-                row.append(month)
-                row.append(day)
-                row.append(hour)
+                pickup_datetime = datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S %Z')
+                row.append(pickup_datetime.year)
+                row.append(pickup_datetime.month)
+                row.append(pickup_datetime.day)
+                row.append(pickup_datetime.hour)
+                row.append(pickup_datetime.weekday())
                 writer.writerow(row)
 
 
@@ -68,17 +66,18 @@ def pre_process_test_data(input_data_path='data/test.csv', output_data_path='dat
         writer = csv.writer(out)
         count = 0
         for row in csv.reader(inp):
-            # Avoid any empty line
-            if len(row) > 0:
-                pickup_datetime = row[1]
-                year = int(pickup_datetime[:4])
-                month = int(pickup_datetime[5:7])
-                day = int(pickup_datetime[8:10])
-                hour = int(pickup_datetime[11:13])
-                row.append(year)
-                row.append(month)
-                row.append(day)
-                row.append(hour)
+            if count > 0:
+                # Avoid any empty line
+                if len(row) > 0:
+                    pickup_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S %Z')
+                    row.append(pickup_datetime.year)
+                    row.append(pickup_datetime.month)
+                    row.append(pickup_datetime.day)
+                    row.append(pickup_datetime.hour)
+                    row.append(pickup_datetime.weekday())
+                    writer.writerow(row)
+            else:
+                # Only the header
                 writer.writerow(row)
             count += 1
 

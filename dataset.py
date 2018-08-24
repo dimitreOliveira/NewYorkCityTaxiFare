@@ -70,7 +70,7 @@ def add_engineered(features):
 
 def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
     # Input columns
-    (plon, plat, dlon, dlat, pcount, year, month, day, hour, latdiff, londiff, euclidean) = input_columns
+    (plon, plat, dlon, dlat, pcount, year, month, day, hour, weekday, latdiff, londiff, euclidean) = input_columns
 
     # Bucketize the lats & lons
     latbuckets = np.linspace(38.0, 42.0, nbuckets).tolist()
@@ -81,8 +81,8 @@ def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
     b_dlon = tf.feature_column.bucketized_column(dlon, lonbuckets)
 
     # Feature cross
-    ploc = tf.feature_column.crossed_column([b_plat, b_plon], nbuckets * nbuckets)
-    dloc = tf.feature_column.crossed_column([b_dlat, b_dlon], nbuckets * nbuckets)
+    ploc = tf.feature_column.crossed_column([b_plat, b_plon], nbuckets ** 2)
+    dloc = tf.feature_column.crossed_column([b_dlat, b_dlon], nbuckets ** 2)
     pd_pair = tf.feature_column.crossed_column([ploc, dloc], nbuckets ** 4)
 
     # Wide columns and deep columns
@@ -91,7 +91,7 @@ def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
         dloc, ploc, pd_pair,
 
         # Sparse columns
-        month, day, hour,
+        month, day, hour, weekday,
 
         # Anything with a linear relationship
         year, pcount
@@ -137,23 +137,23 @@ def pandas_train_input_fn(df, label):
     )
 
 
-def numpy_train_input_fn(df, features, label):
-    return tf.estimator.inputs.numpy_input_fn(
-        x={features[i]: df[:, i] for i in range(len(features))},
-        y=label,
-        batch_size=128,
-        num_epochs=100,
-        shuffle=True,
-        queue_capacity=1000
-    )
-
-
 def pandas_test_input_fn(df):
     return tf.estimator.inputs.pandas_input_fn(
         x=df,
         y=None,
         batch_size=128,
         num_epochs=1,
+        shuffle=True,
+        queue_capacity=1000
+    )
+
+
+def numpy_train_input_fn(df, features, label):
+    return tf.estimator.inputs.numpy_input_fn(
+        x={features[i]: df[:, i] for i in range(len(features))},
+        y=label,
+        batch_size=128,
+        num_epochs=100,
         shuffle=True,
         queue_capacity=1000
     )
