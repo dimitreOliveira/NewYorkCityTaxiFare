@@ -35,21 +35,6 @@ def read_dataset(filename, mode, features_cols, label_col, default_value, batch_
     return _input_fn
 
 
-def get_train(data_path, features, label, default_value, batch_size=512):
-    return read_dataset(data_path, mode=tf.estimator.ModeKeys.TRAIN, features_cols=features, label_col=label,
-                        default_value=default_value, batch_size=batch_size)
-
-
-def get_valid(data_path, features, label, default_value, batch_size=512):
-    return read_dataset(data_path, mode=tf.estimator.ModeKeys.EVAL, features_cols=features, label_col=label,
-                        default_value=default_value, batch_size=batch_size)
-
-
-def get_test(data_path, features, label, default_value, batch_size=512):
-    return read_dataset(data_path, mode=tf.estimator.ModeKeys.PREDICT, features_cols=features, label_col=label,
-                        default_value=default_value, batch_size=batch_size)
-
-
 def add_engineered(features):
     # Feature engineering as data is feed
     lat1 = features['pickup_latitude']
@@ -84,11 +69,12 @@ def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
     ploc = tf.feature_column.crossed_column([b_plat, b_plon], nbuckets ** 2)
     dloc = tf.feature_column.crossed_column([b_dlat, b_dlon], nbuckets ** 2)
     pd_pair = tf.feature_column.crossed_column([ploc, dloc], nbuckets ** 4)
+    day_hr = tf.feature_column.crossed_column([weekday, hour], 24 * 7)
 
     # Wide columns and deep columns
     wide_columns = [
         # Feature crosses
-        dloc, ploc, pd_pair,
+        dloc, ploc, pd_pair, day_hr,
 
         # Sparse columns
         month, day, hour, weekday,
@@ -100,6 +86,7 @@ def build_estimator(model_dir, nbuckets, hidden_units, input_columns):
     deep_columns = [
         # Embedding_column to "group" together
         tf.feature_column.embedding_column(pd_pair, 10),
+        tf.feature_column.embedding_column(day_hr, 10),
 
         # Numeric columns
         plat, plon, dlat, dlon,

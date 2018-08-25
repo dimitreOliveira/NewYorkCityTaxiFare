@@ -8,10 +8,11 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model9'
-SUBMISSION_NAME = 'submission9.csv'
+MODEL_DIR = 'models/model10'
+SUBMISSION_NAME = 'submission10.csv'
 
 
+BATCH_SIZE = 512
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
                'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday']
 LABEL_COLUMN = 'fare_amount'
@@ -41,15 +42,21 @@ INPUT_COLUMNS = [
 estimator = build_estimator(MODEL_DIR, 16, [64, 64, 64, 8], INPUT_COLUMNS)
 
 run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000, save_checkpoints_steps=5000)
-train_spec = tf.estimator.TrainSpec(input_fn=get_train(TRAIN_PATH, CSV_COLUMNS, LABEL_COLUMN, default_value=DEFAULTS),
-                                    max_steps=100000)
-eval_spec = tf.estimator.EvalSpec(input_fn=get_valid(VALIDATION_PATH, CSV_COLUMNS, LABEL_COLUMN,
-                                                     default_value=DEFAULTS), steps=1000, throttle_secs=300)
+train_spec = tf.estimator.TrainSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
+                                                          features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
+                                                          default_value=DEFAULTS, batch_size=BATCH_SIZE),
+                                    max_steps=258000)
+eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.EVAL,
+                                                        features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
+                                                        default_value=DEFAULTS, batch_size=BATCH_SIZE),
+                                  steps=1000, throttle_secs=300)
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 
 # Make predictions
-# predictions = model.predict(input_fn=get_test())
+# predictions = estimator.predict(input_fn=read_dataset(TEST_PATH, mode=tf.estimator.ModeKeys.PREDICT,
+#                                                       features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
+#                                                       default_value=DEFAULTS, batch_size=BATCH_SIZE))
 test_raw = pd.read_csv(TEST_PATH)
 add_engineered(test_raw)
 prediction = estimator.predict(pandas_test_input_fn(test_raw))
