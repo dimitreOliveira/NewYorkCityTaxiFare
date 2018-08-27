@@ -17,7 +17,8 @@ BATCH_SIZE = 512
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
                'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday']
 LABEL_COLUMN = 'fare_amount'
-DEFAULTS = [['nokey'], [1.0], ['2009-06-15 17:26:21 UTC'], [-74.0], [40.0], [-74.0], [40.7], [1.0], [2009], [6], [15], [17], [1]]
+DEFAULTS = [['nokey'], [1.0], ['2009-06-15 17:26:21 UTC'], [-74.0], [40.0], [-74.0], [40.7], [1.0], [2009], [6], [15],
+            [17], [1]]
 INPUT_COLUMNS = [
     # raw data columns
     tf.feature_column.numeric_column('pickup_longitude'),

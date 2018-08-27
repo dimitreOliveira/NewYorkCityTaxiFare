@@ -12,7 +12,7 @@ def clean_data(input_data_path='data/train.csv', output_data_path='data/train_cl
     :param input_data_path: path containing the raw data set.
     :param output_data_path: path to write the cleaned data.
     """
-    with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
+    with open(input_data_path, 'r') as inp, open(output_data_path, 'w', newline='') as out:
         writer = csv.writer(out)
         count = 0
         for row in csv.reader(inp):
@@ -42,18 +42,16 @@ def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data
     :param input_data_path: path containing the full data set.
     :param output_data_path: path to write the pre processed set.
     """
-    with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
+    with open(input_data_path, 'r') as inp, open(output_data_path, 'w', newline='') as out:
         writer = csv.writer(out)
         for row in csv.reader(inp):
-            # Avoid any empty line
-            if len(row) > 0:
-                pickup_datetime = datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S %Z')
-                row.append(pickup_datetime.year)
-                row.append(pickup_datetime.month)
-                row.append(pickup_datetime.day)
-                row.append(pickup_datetime.hour)
-                row.append(pickup_datetime.weekday())
-                writer.writerow(row)
+            pickup_datetime = datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S %Z')
+            row.append(pickup_datetime.year)
+            row.append(pickup_datetime.month)
+            row.append(pickup_datetime.day)
+            row.append(pickup_datetime.hour)
+            row.append(pickup_datetime.weekday())
+            writer.writerow(row)
 
 
 def pre_process_test_data(input_data_path='data/test.csv', output_data_path='data/test_processed.csv'):
@@ -62,20 +60,18 @@ def pre_process_test_data(input_data_path='data/test.csv', output_data_path='dat
     :param input_data_path: path containing the full data set.
     :param output_data_path: path to write the pre processed set.
     """
-    with open(input_data_path, 'r') as inp, open(output_data_path, 'w') as out:
+    with open(input_data_path, 'r') as inp, open(output_data_path, 'w', newline='') as out:
         writer = csv.writer(out)
         count = 0
         for row in csv.reader(inp):
             if count > 0:
-                # Avoid any empty line
-                if len(row) > 0:
-                    pickup_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S %Z')
-                    row.append(pickup_datetime.year)
-                    row.append(pickup_datetime.month)
-                    row.append(pickup_datetime.day)
-                    row.append(pickup_datetime.hour)
-                    row.append(pickup_datetime.weekday())
-                    writer.writerow(row)
+                pickup_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S %Z')
+                row.append(pickup_datetime.year)
+                row.append(pickup_datetime.month)
+                row.append(pickup_datetime.day)
+                row.append(pickup_datetime.hour)
+                row.append(pickup_datetime.weekday())
+                writer.writerow(row)
             else:
                 # Only the header
                 writer.writerow(row)
@@ -90,15 +86,14 @@ def split_data(input_data_path, train_data_path, validation_data_path, ratio=30)
     :param validation_data_path: path to write the validation set.
     :param ratio: ration to split train and validation sets, (default: 1 of every 30 rows will be validation or 0,033%)
     """
-    with open(input_data_path, 'r') as inp, open(train_data_path, 'w') as out1, open(validation_data_path, 'w') as out2:
+    with open(input_data_path, 'r') as inp, open(train_data_path, 'w', newline='') as out1, \
+            open(validation_data_path, 'w', newline='') as out2:
         writer1 = csv.writer(out1)
         writer2 = csv.writer(out2)
         count = 0
         for row in csv.reader(inp):
-            # Avoid any empty line
-            if len(row) > 0:
-                if count % ratio == 0:
-                    writer2.writerow(row)
-                else:
-                    writer1.writerow(row)
-                count += 1
+            if count % ratio == 0:
+                writer2.writerow(row)
+            else:
+                writer1.writerow(row)
+            count += 1

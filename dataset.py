@@ -69,7 +69,7 @@ def pandas_test_input_fn(df):
         y=None,
         batch_size=128,
         num_epochs=1,
-        shuffle=True,
+        shuffle=False,
         queue_capacity=1000
     )
 
@@ -91,7 +91,7 @@ def numpy_test_input_fn(df, features):
         y=None,
         batch_size=128,
         num_epochs=1,
-        shuffle=True,
+        shuffle=False,
         queue_capacity=1000
     )
 
@@ -105,3 +105,45 @@ def output_submission(df, prediction_df, id_column, prediction_column, file_name
     df[prediction_column] = prediction_df['predictions'].apply(lambda x: x[0])
     df[[id_column, prediction_column]].to_csv(('submissions/%s' % file_name), index=False)
     print('Output complete')
+
+
+# def read_dataset(filename, mode, features_cols, label_col, default_value, batch_size=512):
+def keras_read_dataset(filename, mode, TIMESERIES_COL, DEFAULTS, label_index=1, batch_size=512):
+    def _input_fn():
+        # Provide the ability to decode a CSV
+        def decode_csv(line):
+            # all_data is a list of scalar tensors
+            all_data = tf.decode_csv(line, record_defaults=DEFAULTS)
+            inputs = all_data
+            labels = inputs.pop(label_index)  # labels are the column of index 1
+            print('-----------1')
+            print(inputs)
+
+            # # Convert each list of rank R tensors to one rank R+1 tensor
+            # inputs = tf.stack(inputs, axis=0)
+            # labels = tf.stack(labels, axis=0)
+
+            # Convert input R+1 tensor into a feature dictionary of one R+1 tensor
+            # features = {TIMESERIES_COL: inputs}
+            # features = inputs
+
+            return {TIMESERIES_COL: inputs}, labels
+
+        # Create list of files that match pattern
+        file_list = tf.gfile.Glob(filename)
+
+        # Create dataset from file list
+        dataset = tf.data.TextLineDataset(file_list).map(decode_csv)
+
+        if mode == tf.estimator.ModeKeys.TRAIN:
+            num_epochs = None  # indefinitely
+            dataset = dataset.shuffle(buffer_size=10 * batch_size)
+        else:
+            num_epochs = 1  # end-of-input after this
+
+        dataset = dataset.repeat(num_epochs).batch(batch_size)
+
+        iterator = dataset.make_one_shot_iterator()
+        batch_features, batch_labels = iterator.get_next()
+        return batch_features, batch_labels
+    return _input_fn
