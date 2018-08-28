@@ -9,7 +9,7 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model11'
+MODEL_DIR = 'models/model12'
 SUBMISSION_NAME = 'submission12.csv'
 
 
@@ -41,18 +41,18 @@ INPUT_COLUMNS = [
 ]
 
 
-optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-estimator = build_estimator(MODEL_DIR, 16, [100, 50, 20], optimizer, INPUT_COLUMNS)
-
-run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000, save_checkpoints_steps=5000)
 train_spec = tf.estimator.TrainSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
                                                           features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                           default_value=DEFAULTS, batch_size=BATCH_SIZE),
-                                    max_steps=200000)
+                                    max_steps=100000)
 eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(VALIDATION_PATH, mode=tf.estimator.ModeKeys.EVAL,
                                                         features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                         default_value=DEFAULTS, batch_size=BATCH_SIZE),
                                   steps=1000, throttle_secs=300)
+
+
+optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
+estimator = build_estimator(MODEL_DIR, 16, [100, 50, 20], optimizer, INPUT_COLUMNS)
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 

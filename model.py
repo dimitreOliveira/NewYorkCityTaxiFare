@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 
 
-def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns):
+def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns, run_config=None):
     # Input columns
     (plon, plat, dlon, dlat, pcount, year, month, day, hour, weekday, latdiff, londiff, euclidean) = input_columns
 
@@ -47,7 +47,8 @@ def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns)
         linear_feature_columns=wide_columns,
         dnn_feature_columns=deep_columns,
         dnn_hidden_units=hidden_units,
-        dnn_optimizer=optimizer)
+        dnn_optimizer=optimizer,
+        config=run_config)
 
     # add extra evaluation metric for hyperparameter tuning
     estimator = tf.contrib.estimator.add_metrics(estimator, add_eval_metrics)

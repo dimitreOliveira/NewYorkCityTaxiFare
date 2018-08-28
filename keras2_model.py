@@ -1,4 +1,6 @@
 import pandas as pd
+from tensorflow import keras
+
 from model import *
 from dataset import *
 
@@ -9,11 +11,13 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model11'
-SUBMISSION_NAME = 'submission11.csv'
+MODEL_DIR = 'models/kmodel1'
+SUBMISSION_NAME = 'submissionk1.csv'
 
 
 BATCH_SIZE = 512
+INPUT_LAYER = 'key'
+INPUT_COL = '{}_input'.format(INPUT_LAYER)
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
                'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday']
 LABEL_COLUMN = 'fare_amount'
@@ -41,10 +45,10 @@ INPUT_COLUMNS = [
 ]
 
 
-optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-estimator = build_estimator(MODEL_DIR, 16, [100, 50, 20], optimizer, INPUT_COLUMNS)
-
+# optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
+# estimator = build_estimator(MODEL_DIR, 16, [100, 50, 20], optimizer, INPUT_COLUMNS)
 run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000, save_checkpoints_steps=5000)
+
 train_spec = tf.estimator.TrainSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
                                                           features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                           default_value=DEFAULTS, batch_size=BATCH_SIZE),
@@ -53,6 +57,31 @@ eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.esti
                                                         features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                         default_value=DEFAULTS, batch_size=BATCH_SIZE),
                                   steps=1000, throttle_secs=300)
+
+# train_spec = tf.estimator.TrainSpec(input_fn=keras_read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
+#                                                                 TIMESERIES_COL=INPUT_COL, DEFAULTS=DEFAULTS,
+#                                                                 label_index=1, batch_size=BATCH_SIZE),
+#                                     max_steps=100000)
+# eval_spec = tf.estimator.EvalSpec(input_fn=keras_read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.EVAL,
+#                                                               TIMESERIES_COL=INPUT_COL, DEFAULTS=DEFAULTS,
+#                                                               label_index=1, batch_size=BATCH_SIZE),
+#                                   steps=1000, throttle_secs=300)
+
+
+
+
+model = keras.models.Sequential()
+model.add(keras.layers.Dense(100, activation='relu', input_shape=(17,), name=INPUT_LAYER))
+model.add(keras.layers.Dense(50, activation='relu'))
+model.add(keras.layers.Dense(20, activation='relu'))
+model.add(keras.layers.Dense(1, activation='sigmoid', name='labels'))
+
+# adam = optimizers.Adam(lr=0.0001)
+model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+
+estimator = keras.estimator.model_to_estimator(keras_model=model, config=run_config)
+
+
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 
