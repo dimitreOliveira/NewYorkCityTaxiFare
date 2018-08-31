@@ -29,7 +29,8 @@ def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns,
         month, day, hour, weekday,
 
         # Anything with a linear relationship
-        year, pcount
+        year
+        # , pcount
     ]
 
     deep_columns = [
@@ -38,7 +39,7 @@ def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns,
         tf.feature_column.embedding_column(day_hr, 10),
 
         # Numeric columns
-        plat, plon, dlat, dlon,
+        # plat, plon, dlat, dlon,
         latdiff, londiff, euclidean
     ]
 

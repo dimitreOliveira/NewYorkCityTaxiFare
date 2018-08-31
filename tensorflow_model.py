@@ -9,8 +9,8 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model12'
-SUBMISSION_NAME = 'submission12.csv'
+MODEL_DIR = 'models/model15'
+SUBMISSION_NAME = 'submission15.csv'
 
 
 BATCH_SIZE = 512
@@ -27,7 +27,7 @@ INPUT_COLUMNS = [
     tf.feature_column.numeric_column('dropoff_latitude'),
     tf.feature_column.numeric_column('passenger_count'),
 
-    # engineered columns'1
+    # engineered columns
     tf.feature_column.numeric_column('year'),
     tf.feature_column.categorical_column_with_identity('month', num_buckets=13),
     tf.feature_column.categorical_column_with_identity('day', num_buckets=32),
@@ -44,7 +44,7 @@ INPUT_COLUMNS = [
 train_spec = tf.estimator.TrainSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
                                                           features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                           default_value=DEFAULTS, batch_size=BATCH_SIZE),
-                                    max_steps=100000)
+                                    max_steps=95000)
 eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(VALIDATION_PATH, mode=tf.estimator.ModeKeys.EVAL,
                                                         features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                         default_value=DEFAULTS, batch_size=BATCH_SIZE),
@@ -52,7 +52,7 @@ eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(VALIDATION_PATH, mode=tf
 
 
 optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
-estimator = build_estimator(MODEL_DIR, 16, [100, 50, 20], optimizer, INPUT_COLUMNS)
+estimator = build_estimator(MODEL_DIR, 16, [128, 64, 32, 16], optimizer, INPUT_COLUMNS)
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 

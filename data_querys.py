@@ -14,26 +14,26 @@ def clean_data(input_data_path='data/train.csv', output_data_path='data/train_cl
     """
     with open(input_data_path, 'r') as inp, open(output_data_path, 'w', newline='') as out:
         writer = csv.writer(out)
-        count = 0
-        for row in csv.reader(inp):
-            # Remove header
-            if count > 0:
-                # Only rows with non-null values
-                if len(row) == 8:
-                    try:
-                        fare_amount = float(row[1])
-                        pickup_longitude = float(row[3])
-                        pickup_latitude = float(row[4])
-                        dropoff_longitude = float(row[5])
-                        dropoff_latitude = float(row[6])
-                        passenger_count = float(row[7])
-                        if ((-76 <= pickup_longitude <= -72) and (-76 <= dropoff_longitude <= -72) and
-                                (38 <= pickup_latitude <= 42) and (38 <= dropoff_latitude <= 42) and
-                                (1 <= passenger_count <= 6) and fare_amount > 0):
-                            writer.writerow(row)
-                    except:
-                        pass
-            count += 1
+        csv_reader = csv.reader(inp)
+        # Skip header
+        next(csv_reader)
+        for row in csv_reader:
+            # Only rows with non-null values
+            if len(row) == 8:
+                try:
+                    fare_amount = float(row[1])
+                    pickup_longitude = float(row[3])
+                    pickup_latitude = float(row[4])
+                    dropoff_longitude = float(row[5])
+                    dropoff_latitude = float(row[6])
+                    passenger_count = float(row[7])
+                    if ((-76 <= pickup_longitude <= -72) and (-76 <= dropoff_longitude <= -72) and
+                            (38 <= pickup_latitude <= 42) and (38 <= dropoff_latitude <= 42) and
+                            (1 <= passenger_count <= 6) and (0 < fare_amount <= 300) and
+                            (pickup_longitude != dropoff_longitude) and (pickup_latitude != dropoff_latitude)):
+                        writer.writerow(row)
+                except:
+                    pass
 
 
 def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data_path='data/train_processed.csv'):
@@ -46,11 +46,21 @@ def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data
         writer = csv.writer(out)
         for row in csv.reader(inp):
             pickup_datetime = datetime.strptime(row[2], '%Y-%m-%d %H:%M:%S %Z')
+            hour = pickup_datetime.hour
+            weekday = pickup_datetime.weekday()
+            night = 0
+            late_night = 0
+            if 6 >= hour >= 20:
+                night = 1
+            if (20 >= hour >= 16) and (weekday < 5):
+                late_night = 1
             row.append(pickup_datetime.year)
             row.append(pickup_datetime.month)
             row.append(pickup_datetime.day)
-            row.append(pickup_datetime.hour)
-            row.append(pickup_datetime.weekday())
+            row.append(hour)
+            row.append(weekday)
+            row.append(night)
+            row.append(late_night)
             writer.writerow(row)
 
 
@@ -62,20 +72,30 @@ def pre_process_test_data(input_data_path='data/test.csv', output_data_path='dat
     """
     with open(input_data_path, 'r') as inp, open(output_data_path, 'w', newline='') as out:
         writer = csv.writer(out)
-        count = 0
-        for row in csv.reader(inp):
-            if count > 0:
-                pickup_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S %Z')
-                row.append(pickup_datetime.year)
-                row.append(pickup_datetime.month)
-                row.append(pickup_datetime.day)
-                row.append(pickup_datetime.hour)
-                row.append(pickup_datetime.weekday())
-                writer.writerow(row)
-            else:
-                # Only the header
-                writer.writerow(row)
-            count += 1
+        csv_reader = csv.reader(inp)
+        # Skip header
+        next(csv_reader)
+        for row in csv_reader:
+            pickup_datetime = datetime.strptime(row[1], '%Y-%m-%d %H:%M:%S %Z')
+            hour = pickup_datetime.hour
+            weekday = pickup_datetime.weekday()
+            night = 0
+            late_night = 0
+            if 6 >= hour >= 20:
+                night = 1
+            if (20 >= hour >= 16) and (weekday < 5):
+                late_night = 1
+            row.append(pickup_datetime.year)
+            row.append(pickup_datetime.month)
+            row.append(pickup_datetime.day)
+            row.append(hour)
+            row.append(weekday)
+            row.append(night)
+            row.append(late_night)
+            writer.writerow(row)
+        else:
+            # Only the header
+            writer.writerow(row)
 
 
 def split_data(input_data_path, train_data_path, validation_data_path, ratio=30):
@@ -97,3 +117,22 @@ def split_data(input_data_path, train_data_path, validation_data_path, ratio=30)
             else:
                 writer1.writerow(row)
             count += 1
+
+
+def normalize_data(train_data_path, validation_data_path, train_data_normalized_path, validation_data_normalized_path):
+    """
+
+    :param train_data_path:
+    :param validation_data_path:
+    :param train_data_normalized_path:
+    :param validation_data_normalized_path:
+    :return:
+    """
+    with open(train_data_path, 'r') as inp1, open(validation_data_path, 'r') as inp2, \
+            open(train_data_normalized_path, 'w', newline='') as out1, open(validation_data_normalized_path, 'w', newline='') as out2:
+        writer1 = csv.writer(out1)
+        writer2 = csv.writer(out2)
+        # pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count, year, month, hour
+
+        for row in csv.reader(inp1):
+            writer1.writerow(row)
