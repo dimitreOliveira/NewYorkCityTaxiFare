@@ -43,11 +43,13 @@ def add_engineered(features):
     latdiff = (lat1 - lat2)
     londiff = (lon1 - lon2)
     euclidean = (latdiff ** 2 + londiff ** 2) ** 0.5
+    manhattan = tf.abs(lat2 - lat1) + tf.abs(lon2 - lon1)
 
     # Add new features
     features['latdiff'] = latdiff
     features['londiff'] = londiff
     features['euclidean'] = euclidean
+    features['manhattan'] = manhattan
 
     return features
 

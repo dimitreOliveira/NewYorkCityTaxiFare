@@ -93,9 +93,6 @@ def pre_process_test_data(input_data_path='data/test.csv', output_data_path='dat
             row.append(night)
             row.append(late_night)
             writer.writerow(row)
-        else:
-            # Only the header
-            writer.writerow(row)
 
 
 def split_data(input_data_path='data/train_processed.csv', train_data_path='data/tf_train.csv',
