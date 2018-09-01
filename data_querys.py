@@ -50,9 +50,9 @@ def pre_process_train_data(input_data_path='data/train_cleaned.csv', output_data
             weekday = pickup_datetime.weekday()
             night = 0
             late_night = 0
-            if 6 >= hour >= 20:
+            if ((hour <= 20) or (hour >= 16)) and (weekday < 5):
                 night = 1
-            if (20 >= hour >= 16) and (weekday < 5):
+            if (hour <= 6) or (hour >= 20):
                 late_night = 1
             row.append(pickup_datetime.year)
             row.append(pickup_datetime.month)
@@ -81,9 +81,9 @@ def pre_process_test_data(input_data_path='data/test.csv', output_data_path='dat
             weekday = pickup_datetime.weekday()
             night = 0
             late_night = 0
-            if 6 >= hour >= 20:
+            if ((hour <= 20) or (hour >= 16)) and (weekday < 5):
                 night = 1
-            if (20 >= hour >= 16) and (weekday < 5):
+            if (hour <= 6) or (hour >= 20):
                 late_night = 1
             row.append(pickup_datetime.year)
             row.append(pickup_datetime.month)
@@ -98,7 +98,8 @@ def pre_process_test_data(input_data_path='data/test.csv', output_data_path='dat
             writer.writerow(row)
 
 
-def split_data(input_data_path, train_data_path, validation_data_path, ratio=30):
+def split_data(input_data_path='data/train_processed.csv', train_data_path='data/tf_train.csv',
+               validation_data_path='data/tf_validation.csv', ratio=30):
     """
     Splits the csv file (meant to generate train and validation sets).
     :param input_data_path: path containing the full data set.
@@ -117,22 +118,3 @@ def split_data(input_data_path, train_data_path, validation_data_path, ratio=30)
             else:
                 writer1.writerow(row)
             count += 1
-
-
-def normalize_data(train_data_path, validation_data_path, train_data_normalized_path, validation_data_normalized_path):
-    """
-
-    :param train_data_path:
-    :param validation_data_path:
-    :param train_data_normalized_path:
-    :param validation_data_normalized_path:
-    :return:
-    """
-    with open(train_data_path, 'r') as inp1, open(validation_data_path, 'r') as inp2, \
-            open(train_data_normalized_path, 'w', newline='') as out1, open(validation_data_normalized_path, 'w', newline='') as out2:
-        writer1 = csv.writer(out1)
-        writer2 = csv.writer(out2)
-        # pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude, passenger_count, year, month, hour
-
-        for row in csv.reader(inp1):
-            writer1.writerow(row)

@@ -4,7 +4,7 @@ import tensorflow as tf
 
 def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns, run_config=None):
     # Input columns
-    (plon, plat, dlon, dlat, pcount, year, month, day, hour, weekday, latdiff, londiff, euclidean) = input_columns
+    (plon, plat, dlon, dlat, pcount, year, month, day, hour, weekday, night, late_night, latdiff, londiff, euclidean) = input_columns
 
     # Bucketize the lats & lons
     latbuckets = np.linspace(38.0, 42.0, nbuckets).tolist()
@@ -29,7 +29,7 @@ def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns,
         month, day, hour, weekday,
 
         # Anything with a linear relationship
-        year
+        year, night, late_night
         # , pcount
     ]
 
@@ -39,8 +39,9 @@ def build_estimator(model_dir, nbuckets, hidden_units, optimizer, input_columns,
         tf.feature_column.embedding_column(day_hr, 10),
 
         # Numeric columns
-        # plat, plon, dlat, dlon,
-        latdiff, londiff, euclidean
+        plat, plon, dlat, dlon,
+        # latdiff, londiff,
+        euclidean
     ]
 
     estimator = tf.estimator.DNNLinearCombinedRegressor(

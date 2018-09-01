@@ -9,16 +9,16 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model15'
-SUBMISSION_NAME = 'submission15.csv'
+MODEL_DIR = 'models/model16'
+SUBMISSION_NAME = 'submission16.csv'
 
 
 BATCH_SIZE = 512
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
-               'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday']
+               'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday', 'night', 'late_night']
 LABEL_COLUMN = 'fare_amount'
 DEFAULTS = [['nokey'], [1.0], ['2009-06-15 17:26:21 UTC'], [-74.0], [40.0], [-74.0], [40.7], [1.0], [2009], [6], [15],
-            [17], [1]]
+            [17], [1], [1], [1]]
 INPUT_COLUMNS = [
     # raw data columns
     tf.feature_column.numeric_column('pickup_longitude'),
@@ -33,6 +33,8 @@ INPUT_COLUMNS = [
     tf.feature_column.categorical_column_with_identity('day', num_buckets=32),
     tf.feature_column.categorical_column_with_identity('hour', num_buckets=24),
     tf.feature_column.categorical_column_with_identity('weekday', num_buckets=7),
+    tf.feature_column.numeric_column('night'),
+    tf.feature_column.numeric_column('late_night'),
 
     # tensorflow engineered columns
     tf.feature_column.numeric_column('latdiff'),
@@ -44,7 +46,7 @@ INPUT_COLUMNS = [
 train_spec = tf.estimator.TrainSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
                                                           features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                           default_value=DEFAULTS, batch_size=BATCH_SIZE),
-                                    max_steps=95000)
+                                    max_steps=100000)
 eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(VALIDATION_PATH, mode=tf.estimator.ModeKeys.EVAL,
                                                         features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                         default_value=DEFAULTS, batch_size=BATCH_SIZE),
