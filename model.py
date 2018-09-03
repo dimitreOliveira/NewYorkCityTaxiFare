@@ -78,29 +78,32 @@ def build_deep_estimator(model_dir, nbuckets, hidden_units, optimizer, input_col
     pd_pair = tf.feature_column.crossed_column([ploc, dloc], nbuckets ** 4)
     day_hr = tf.feature_column.crossed_column([weekday, hour], 24 * 7)
 
-    deep_columns = [
-        # Embedding_column to "group" together
-        tf.feature_column.embedding_column(pd_pair, 10),
-        tf.feature_column.embedding_column(day_hr, 10),
+    # Turn sparse columns into one-hot
+    oh_night = tf.feature_column.indicator_column(night)
+    oh_late_night = tf.feature_column.indicator_column(late_night)
 
-        # Feature crosses
-        # dloc, ploc,  CAN'T USE
+    feature_columns = [
+        # Embedding_column to "group" together
+        tf.feature_column.embedding_column(pd_pair, nbuckets),
+        tf.feature_column.embedding_column(ploc, (nbuckets ** 0.5)),
+        tf.feature_column.embedding_column(dloc, (nbuckets ** 0.5)),
+        tf.feature_column.embedding_column(day_hr, np.floor((24 * 7) ** 0.25)),
 
         # Sparse columns
-        # month, weekday, CAN'T USE
+        # month, weekday,
+        # day, hour,
 
         # Numeric columns
-        plat, plon, dlat, dlon,
-        # day, hour, CAN'T USE
+        b_plat, b_dlat, b_plon, b_dlon,
         year,
-        night, late_night,
+        oh_night, oh_late_night,
         latdiff, londiff,
         euclidean, manhattan
     ]
 
     estimator = tf.estimator.DNNRegressor(
         model_dir=model_dir,
-        feature_columns=deep_columns,
+        feature_columns=feature_columns,
         hidden_units=hidden_units,
         optimizer=optimizer,
         config=run_config)

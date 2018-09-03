@@ -9,8 +9,8 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model17'
-SUBMISSION_NAME = 'submission17.csv'
+MODEL_DIR = 'models/model20'
+SUBMISSION_NAME = 'submission20.csv'
 
 
 BATCH_SIZE = 512
@@ -33,8 +33,8 @@ INPUT_COLUMNS = [
     tf.feature_column.categorical_column_with_identity('day', num_buckets=32),
     tf.feature_column.categorical_column_with_identity('hour', num_buckets=24),
     tf.feature_column.categorical_column_with_identity('weekday', num_buckets=7),
-    tf.feature_column.numeric_column('night'),
-    tf.feature_column.numeric_column('late_night'),
+    tf.feature_column.categorical_column_with_identity('night', num_buckets=2),
+    tf.feature_column.categorical_column_with_identity('late_night', num_buckets=2),
 
     # tensorflow engineered columns
     tf.feature_column.numeric_column('latdiff'),
@@ -55,7 +55,7 @@ eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(VALIDATION_PATH, mode=tf
 
 
 optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
-estimator = build_deep_estimator(MODEL_DIR, 16, [64, 64, 64, 16], optimizer, INPUT_COLUMNS)
+estimator = build_deep_estimator(MODEL_DIR, 16, [256, 128, 64, 32, 16, 8], optimizer, INPUT_COLUMNS)
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 

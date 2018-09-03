@@ -1,5 +1,5 @@
 import tensorflow as tf
-
+import numpy as np
 
 def read_dataset(filename, mode, features_cols, label_col, default_value, batch_size=512):
     def _input_fn():
@@ -43,7 +43,7 @@ def add_engineered(features):
     latdiff = (lat1 - lat2)
     londiff = (lon1 - lon2)
     euclidean = (latdiff ** 2 + londiff ** 2) ** 0.5
-    manhattan = tf.abs(lat2 - lat1) + tf.abs(lon2 - lon1)
+    manhattan = np.abs(lat2 - lat1) + np.abs(lon2 - lon1)
 
     # Add new features
     features['latdiff'] = latdiff
