@@ -9,8 +9,8 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model20'
-SUBMISSION_NAME = 'submission20.csv'
+MODEL_DIR = 'models/model21'
+SUBMISSION_NAME = 'submission21.csv'
 
 
 BATCH_SIZE = 512

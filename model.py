@@ -81,6 +81,10 @@ def build_deep_estimator(model_dir, nbuckets, hidden_units, optimizer, input_col
     # Turn sparse columns into one-hot
     oh_night = tf.feature_column.indicator_column(night)
     oh_late_night = tf.feature_column.indicator_column(late_night)
+    oh_month = tf.feature_column.indicator_column(month)
+    oh_weekday = tf.feature_column.indicator_column(weekday)
+    oh_hour = tf.feature_column.indicator_column(hour)
+    # oh_day = tf.feature_column.indicator_column(day)
 
     feature_columns = [
         # Embedding_column to "group" together
@@ -89,14 +93,13 @@ def build_deep_estimator(model_dir, nbuckets, hidden_units, optimizer, input_col
         tf.feature_column.embedding_column(dloc, (nbuckets ** 0.5)),
         tf.feature_column.embedding_column(day_hr, np.floor((24 * 7) ** 0.25)),
 
-        # Sparse columns
-        # month, weekday,
-        # day, hour,
+        # One-hot encoded columns
+        oh_night, oh_late_night,
+        oh_month, oh_weekday, oh_hour,
 
         # Numeric columns
         b_plat, b_dlat, b_plon, b_dlon,
         year,
-        oh_night, oh_late_night,
         latdiff, londiff,
         euclidean, manhattan
     ]
