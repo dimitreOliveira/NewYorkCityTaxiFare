@@ -9,8 +9,8 @@ tf.logging.set_verbosity(tf.logging.INFO)
 TRAIN_PATH = 'data/tf_train.csv'
 VALIDATION_PATH = 'data/tf_validation.csv'
 TEST_PATH = 'data/test_processed.csv'
-MODEL_DIR = 'models/model21'
-SUBMISSION_NAME = 'submission21.csv'
+MODEL_DIR = 'models/model22'
+SUBMISSION_NAME = 'submission22.csv'
 
 
 BATCH_SIZE = 512
@@ -55,7 +55,8 @@ eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(VALIDATION_PATH, mode=tf
 
 
 optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
-estimator = build_deep_estimator(MODEL_DIR, 16, [256, 128, 64, 32, 16, 8], optimizer, INPUT_COLUMNS)
+# estimator = build_deep_estimator(MODEL_DIR, 16, [256, 128, 64, 32, 16, 8], optimizer, INPUT_COLUMNS)
+estimator = build_combined_estimator(MODEL_DIR, 16, [256, 128, 64, 32, 16, 8], optimizer, INPUT_COLUMNS)
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 

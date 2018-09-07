@@ -27,10 +27,10 @@ def build_combined_estimator(model_dir, nbuckets, hidden_units, optimizer, input
         dloc, ploc, pd_pair, day_hr,
 
         # Sparse columns
-        month, day, hour, weekday,
+        night, late_night,
 
         # Anything with a linear relationship
-        year, night, late_night
+        month, day, hour, weekday, year
         # , pcount
     ]
 
@@ -41,7 +41,7 @@ def build_combined_estimator(model_dir, nbuckets, hidden_units, optimizer, input
 
         # Numeric columns
         plat, plon, dlat, dlon,
-        # latdiff, londiff,
+        latdiff, londiff,
         euclidean, manhattan
     ]
 
