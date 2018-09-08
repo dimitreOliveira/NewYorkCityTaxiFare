@@ -98,11 +98,6 @@ def numpy_test_input_fn(df, features):
     )
 
 
-def make_feature_cols(features):
-    input_columns = [tf.feature_column.numeric_column(f) for f in features]
-    return input_columns
-
-
 def output_submission(df, prediction_df, id_column, prediction_column, file_name):
     df[prediction_column] = prediction_df['predictions'].apply(lambda x: x[0])
     df[[id_column, prediction_column]].to_csv(('submissions/%s' % file_name), index=False)

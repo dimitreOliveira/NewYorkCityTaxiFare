@@ -97,7 +97,7 @@ SUBMISSION_NAME = 'submissions/keras_submission.csv'
 BATCH_SIZE = 256
 EPOCHS = 50
 LEARNING_RATE = 0.0001
-DATASET_SIZE = 7000000
+DATASET_SIZE = 2000000
 
 # Load values in a more compact form
 data_types = {'key': 'str',
@@ -120,7 +120,7 @@ data_names = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pick
               'passenger_count', 'year', 'month', 'day', 'hour', 'weekday', 'night', 'late_night']
 
 train = pd.read_csv(TRAIN_PATH, nrows=DATASET_SIZE, dtype=data_types, usecols=[1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14], names=data_names)
-test = pd.read_csv(TEST_PATH, usecols=[0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13])
+test = pd.read_csv(TEST_PATH, usecols=[0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13])
 
 
 # process data
@@ -170,7 +170,6 @@ model.add(Dense(1))
 
 adam = optimizers.adam(lr=LEARNING_RATE)
 model.compile(loss='mse', optimizer=adam, metrics=['mae'])
-# early = EarlyStopping(monitor='val_loss', patience=15, mode='min')
 
 history = model.fit(x=train_df_scaled, y=train_labels, batch_size=BATCH_SIZE, epochs=EPOCHS,
                     verbose=2, validation_data=(validation_df_scaled, validation_labels),
