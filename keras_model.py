@@ -15,6 +15,8 @@ MODEL_DIR = 'models/kmodel1'
 SUBMISSION_NAME = 'submissionk1.csv'
 
 
+LEARNING_RATE = 0.0001
+STEPS = 100000
 BATCH_SIZE = 512
 INPUT_LAYER = 'key'
 INPUT_COL = '{}_input'.format(INPUT_LAYER)
@@ -45,14 +47,12 @@ INPUT_COLUMNS = [
 ]
 
 
-# optimizer = tf.train.AdamOptimizer(learning_rate=0.01)
-# estimator = build_estimator(MODEL_DIR, 16, [100, 50, 20], optimizer, INPUT_COLUMNS)
 run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000, save_checkpoints_steps=5000)
 
 train_spec = tf.estimator.TrainSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
                                                           features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                           default_value=DEFAULTS, batch_size=BATCH_SIZE),
-                                    max_steps=100000)
+                                    max_steps=STEPS)
 eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.EVAL,
                                                         features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                         default_value=DEFAULTS, batch_size=BATCH_SIZE),
@@ -69,14 +69,12 @@ eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.esti
 
 
 
-
 model = keras.models.Sequential()
 model.add(keras.layers.Dense(100, activation='relu', input_shape=(17,), name=INPUT_LAYER))
 model.add(keras.layers.Dense(50, activation='relu'))
 model.add(keras.layers.Dense(20, activation='relu'))
 model.add(keras.layers.Dense(1, activation='sigmoid', name='labels'))
 
-# adam = optimizers.Adam(lr=0.0001)
 model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
 estimator = keras.estimator.model_to_estimator(keras_model=model, config=run_config)
@@ -85,10 +83,6 @@ estimator = keras.estimator.model_to_estimator(keras_model=model, config=run_con
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 
-# Make predictions
-# predictions = estimator.predict(input_fn=read_dataset(TEST_PATH, mode=tf.estimator.ModeKeys.PREDICT,
-#                                                       features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
-#                                                       default_value=DEFAULTS, batch_size=BATCH_SIZE))
 test_raw = pd.read_csv(TEST_PATH)
 add_engineered(test_raw)
 prediction = estimator.predict(pandas_test_input_fn(test_raw))

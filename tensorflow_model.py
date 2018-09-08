@@ -13,6 +13,9 @@ MODEL_DIR = 'models/model22'
 SUBMISSION_NAME = 'submission22.csv'
 
 
+LEARNING_RATE = 0.0001
+HIDDEN_UNITS = [256, 128, 64, 32, 16, 8]
+STEPS = 300000
 BATCH_SIZE = 512
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
                'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday', 'night', 'late_night']
@@ -27,7 +30,7 @@ INPUT_COLUMNS = [
     tf.feature_column.numeric_column('dropoff_latitude'),
     tf.feature_column.numeric_column('passenger_count'),
 
-    # engineered columns
+    # csv engineered columns
     tf.feature_column.numeric_column('year'),
     tf.feature_column.categorical_column_with_identity('month', num_buckets=13),
     tf.feature_column.categorical_column_with_identity('day', num_buckets=32),
@@ -47,16 +50,16 @@ INPUT_COLUMNS = [
 train_spec = tf.estimator.TrainSpec(input_fn=read_dataset(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
                                                           features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                           default_value=DEFAULTS, batch_size=BATCH_SIZE),
-                                    max_steps=100000)
+                                    max_steps=STEPS)
 eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset(VALIDATION_PATH, mode=tf.estimator.ModeKeys.EVAL,
                                                         features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
                                                         default_value=DEFAULTS, batch_size=BATCH_SIZE),
                                   steps=1000, throttle_secs=300)
 
 
-optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
-# estimator = build_deep_estimator(MODEL_DIR, 16, [256, 128, 64, 32, 16, 8], optimizer, INPUT_COLUMNS)
-estimator = build_combined_estimator(MODEL_DIR, 16, [256, 128, 64, 32, 16, 8], optimizer, INPUT_COLUMNS)
+optimizer = tf.train.AdamOptimizer(learning_rate=LEARNING_RATE)
+# estimator = build_deep_estimator(MODEL_DIR, 16, HIDDEN_UNITS, optimizer, INPUT_COLUMNS)
+estimator = build_combined_estimator(MODEL_DIR, 16, HIDDEN_UNITS, optimizer, INPUT_COLUMNS)
 
 tf.estimator.train_and_evaluate(estimator, train_spec=train_spec, eval_spec=eval_spec)
 
