@@ -16,9 +16,16 @@ SUBMISSION_NAME = 'submission_keras.csv'
 
 
 LEARNING_RATE = 0.0001
-STEPS = 1000
+STEPS = 100000
 BATCH_SIZE = 512
-DATASET_SIZE = 20000
+DATASET_SIZE = 4000000
+
+
+CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
+               'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday', 'night', 'late_night']
+LABEL_COLUMN = 'fare_amount'
+DEFAULTS = [['nokey'], [1.0], ['2009-06-15 17:26:21 UTC'], [-74.0], [40.0], [-74.0], [40.7], [1.0], [2009], [6], [15],
+            [17], [1], [1], [1]]
 
 
 def process(df):
@@ -59,14 +66,10 @@ def add_engineered(df):
     lat2 = df['dropoff_latitude']
     lon1 = df['pickup_longitude']
     lon2 = df['dropoff_longitude']
-    weekday = df['weekday']
-    hour = df['hour']
 
     latdiff = (lat1 - lat2)
     londiff = (lon1 - lon2)
     euclidean = (latdiff ** 2 + londiff ** 2) ** 0.5
-    ploc = lat1 * lon1
-    dloc = lat2 * lon2
 
     # Add new features
     df['latdiff'] = latdiff
@@ -91,6 +94,43 @@ def input_function(features, labels=None, shuffle=False):
     return input_fn
 
 
+def read_dataset2(filename, mode, features_cols, label_col, default_value, batch_size=512):
+    def _input_fn():
+        def decode_csv(value_column):
+            columns = tf.decode_csv(value_column, record_defaults=default_value)
+            features = dict(zip(features_cols, columns))
+            label = features.pop(label_col)
+
+            features = tf.cast(features, dtype=tf.float32)
+            features = {"raw_input": add_engineered(features)}
+            label = tf.cast(label, dtype=tf.float32)
+            return features, label
+
+        # Create list of file names that match "glob" pattern (i.e. data_file_*.csv)
+        filenames_dataset = tf.data.Dataset.list_files(filename)
+        # Read lines from text files
+        # use tf.data.Dataset.flat_map to apply one to many transformations (here: filename -> text lines)
+        textlines_dataset = filenames_dataset.flat_map(tf.data.TextLineDataset)
+        # Parse text lines as comma-separated values (CSV)
+        # use tf.data.Dataset.map      to apply one to one  transformations (here: text line -> feature list)
+        dataset = textlines_dataset.map(decode_csv)
+
+        if mode == tf.estimator.ModeKeys.TRAIN:
+            num_epochs = None  # loop indefinitely
+            dataset = dataset.shuffle(buffer_size=10 * batch_size)
+        elif mode == tf.estimator.ModeKeys.EVAL:
+            num_epochs = 1  # end-of-input after this
+        else:
+            num_epochs = 1  # end-of-input after this
+
+        dataset = dataset.repeat(num_epochs).batch(batch_size)
+        batch_features, batch_labels = dataset.make_one_shot_iterator().get_next()
+
+        return batch_features, batch_labels
+
+    return _input_fn
+
+
 # Load values in a more compact form
 data_types = {'key': 'str',
              'fare_amount': 'float32',
@@ -100,7 +140,7 @@ data_types = {'key': 'str',
              'dropoff_longitude': 'float32',
              'dropoff_latitude': 'float32',
              'passenger_count': 'uint8',
-             'year': 'uint8',
+             'year': 'uint16',
              'month': 'uint8',
              'day': 'uint8',
              'hour': 'uint8',
@@ -149,18 +189,35 @@ test_scaled = scaler.transform(test_clean).astype(np.float32)
 
 
 model = keras.models.Sequential()
-model.add(keras.layers.Dense(100, activation='relu', input_shape=(train_df_scaled.shape[1],), name='raw'))
-model.add(keras.layers.Dense(50, activation='relu'))
-model.add(keras.layers.Dense(20, activation='relu'))
-model.add(keras.layers.Dense(1, activation='sigmoid', name='predictions'))
+model.add(keras.layers.Dense(256, activation='relu', input_shape=(train_df_scaled.shape[1],), name='raw'))
+model.add(keras.layers.BatchNormalization())
+model.add(keras.layers.Dense(128, activation='relu'))
+model.add(keras.layers.BatchNormalization())
+model.add(keras.layers.Dense(64, activation='relu'))
+model.add(keras.layers.BatchNormalization())
+model.add(keras.layers.Dense(32, activation='relu'))
+model.add(keras.layers.BatchNormalization())
+model.add(keras.layers.Dense(16, activation='relu'))
+model.add(keras.layers.BatchNormalization())
+model.add(keras.layers.Dense(1, name='predictions'))
 
-model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+adam = keras.optimizers.Adam(lr=LEARNING_RATE)
+model.compile(loss='mse', optimizer=adam, metrics=['mae'])
 
 run_config = tf.estimator.RunConfig(model_dir=MODEL_DIR, save_summary_steps=5000, save_checkpoints_steps=5000)
 train_spec = tf.estimator.TrainSpec(input_fn=input_function(train_df_scaled, train_labels, True),
                                     max_steps=STEPS)
 eval_spec = tf.estimator.EvalSpec(input_fn=input_function(validation_df_scaled, validation_labels, True),
                                   steps=1000, throttle_secs=300)
+# train_spec = tf.estimator.TrainSpec(input_fn=read_dataset2(TRAIN_PATH, mode=tf.estimator.ModeKeys.TRAIN,
+#                                                           features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
+#                                                           default_value=DEFAULTS, batch_size=BATCH_SIZE),
+#                                     max_steps=STEPS)
+# eval_spec = tf.estimator.EvalSpec(input_fn=read_dataset2(VALIDATION_PATH, mode=tf.estimator.ModeKeys.EVAL,
+#                                                         features_cols=CSV_COLUMNS, label_col=LABEL_COLUMN,
+#                                                         default_value=DEFAULTS, batch_size=BATCH_SIZE),
+#                                   steps=1000, throttle_secs=300)
+
 
 estimator = keras.estimator.model_to_estimator(keras_model=model, config=run_config)
 

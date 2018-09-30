@@ -15,7 +15,7 @@ SUBMISSION_NAME = 'submission22.csv'
 
 LEARNING_RATE = 0.0001
 HIDDEN_UNITS = [256, 128, 64, 32, 16, 8]
-STEPS = 300000
+STEPS = 374000
 BATCH_SIZE = 512
 CSV_COLUMNS = ['key', 'fare_amount', 'pickup_datetime', 'pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
                'dropoff_latitude', 'passenger_count', 'year', 'month', 'day', 'hour', 'weekday', 'night', 'late_night']
