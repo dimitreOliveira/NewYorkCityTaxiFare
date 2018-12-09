@@ -2,6 +2,18 @@
 
 # Deep Learning regression with Tensorflow
 
+## About the repository
+The goal here is use the Tensorflow API and create a end-to-end project, from data loading to model predictions, and use the Kaggle "New York City Taxi Fare Prediction competition" as the data source.
+
+### What you will find
+* Data preprocessing and cleaning using the "csv" library.
+* Data batch loading using Tensorflow.
+* Preprocess each batch by time with Tensorflow.
+* Deep learning models using the estimator API from Tensorflow.
+* Tensorflow estimator API wrapping Keras models.
+* Model validation and analysis using Tensorboard.
+* Model prediction by batch with Tensorflow.
+
 ### New York City Taxi Fare Prediction
 #### Can you predict a rider's taxi fare?
 
@@ -12,5 +24,16 @@ In this playground competition, hosted in partnership with Google Cloud and Cour
 
 To learn how to handle large datasets with ease and solve this problem using TensorFlow, consider taking the Machine Learning with TensorFlow on Google Cloud Platform specialization on Coursera -- the taxi fare problem is one of several real-world problems that are used as case studies in the series of courses.
 
-### Todo:
-* Fix prediction by batch "eg: estimator.predict() using input_fn=read_dataset() as parameter"
+### Dependencies:
+* [csv](https://docs.python.org/3/library/csv.html)
+* [keras](https://keras.io/)
+* [numpy](http://www.numpy.org/)
+* [pandas](http://pandas.pydata.org/)
+* [sklearn](https://scikit-learn.org/stable/)
+* [datetime](https://docs.python.org/2/library/datetime.html)
+* [tensorflow](https://www.tensorflow.org/)
+* [matplotlib](http://matplotlib.org/)
+
+### To-Do:
+* Fix prediction by batch "e.g.: estimator.predict() using input_fn=read_dataset() as parameter"
+* Efficiently use Keras models wrapped by the Tensorflow estimator API.
