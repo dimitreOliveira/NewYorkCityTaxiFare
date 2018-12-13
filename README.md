@@ -25,12 +25,10 @@ In this playground competition, hosted in partnership with Google Cloud and Cour
 To learn how to handle large datasets with ease and solve this problem using TensorFlow, consider taking the Machine Learning with TensorFlow on Google Cloud Platform specialization on Coursera -- the taxi fare problem is one of several real-world problems that are used as case studies in the series of courses.
 
 ### Dependencies:
-* [csv](https://docs.python.org/3/library/csv.html)
 * [keras](https://keras.io/)
 * [numpy](http://www.numpy.org/)
 * [pandas](http://pandas.pydata.org/)
 * [sklearn](https://scikit-learn.org/stable/)
-* [datetime](https://docs.python.org/2/library/datetime.html)
 * [tensorflow](https://www.tensorflow.org/)
 * [matplotlib](http://matplotlib.org/)
 
