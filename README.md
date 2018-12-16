@@ -6,13 +6,13 @@
 The goal here is use the Tensorflow API and create a end-to-end project, from data loading to model predictions, and use the Kaggle "New York City Taxi Fare Prediction competition" as the data source.
 
 ### What you will find
-* Data preprocessing and cleaning using the "csv" library.
-* Data batch loading using Tensorflow.
-* Preprocess each batch by time with Tensorflow.
-* Deep learning models using the estimator API from Tensorflow.
-* Tensorflow estimator API wrapping Keras models.
-* Model validation and analysis using Tensorboard.
-* Model prediction by batch with Tensorflow.
+* Data preprocessing and cleaning using the "csv" library. [[link]](https://github.com/dimitreOliveira/NewYorkCityTaxiFare/blob/master/data_querys.py)
+* Data batch loading using Tensorflow. [[link]](https://github.com/dimitreOliveira/NewYorkCityTaxiFare/blob/master/dataset.py)
+* Preprocess each batch by time with Tensorflow. [[link]](https://github.com/dimitreOliveira/NewYorkCityTaxiFare/blob/master/dataset.py)
+* Deep learning models using the estimator API from Tensorflow. [[link]](https://github.com/dimitreOliveira/NewYorkCityTaxiFare/blob/master/model.py)
+* Tensorflow estimator API wrapping Keras models. [[link]](https://github.com/dimitreOliveira/NewYorkCityTaxiFare/blob/master/keras_model.py)
+* Model validation and analysis using Tensorboard. [[link]](https://github.com/dimitreOliveira/NewYorkCityTaxiFare/blob/master/tensorflow_model.py)
+* Model prediction by batch with Tensorflow. [[link]](https://github.com/dimitreOliveira/NewYorkCityTaxiFare/blob/master/tensorflow_model.py)
 
 ### New York City Taxi Fare Prediction
 #### Can you predict a rider's taxi fare?
