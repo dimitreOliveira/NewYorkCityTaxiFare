@@ -28,7 +28,7 @@ To learn how to handle large datasets with ease and solve this problem using Ten
 * [Keras](https://keras.io/)
 * [NumPy](http://www.numpy.org/)
 * [Pandas](http://pandas.pydata.org/)
-* [SkLearn](https://scikit-learn.org/stable/)
+* [Sklearn](https://scikit-learn.org/stable/)
 * [Tensorflow](https://www.tensorflow.org/)
 * [Matplotlib](http://matplotlib.org/)
 
